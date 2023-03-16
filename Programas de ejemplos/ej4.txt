@@ -1,0 +1,87 @@
+#include <stdio.h>
+const char lenguajes[6][12] = {"Javascript", "HTML", "CSS", "Java", "Python", "C"};
+
+void menosymas(int *a, int i, int n, int &c1, int &c2){
+    if(i<n){
+        if(a[i]<5000){
+            c1++;
+        }
+        if(a[i]>9000){
+            c2++;
+        }
+    menosymas(a,i+1,n,c1,c2);
+    } else return;
+}
+
+void total(int *a, int i, int n, int tot){
+    if(i==n){
+    	printf("Total de encuestas realizadas: %d.\n", tot);
+    	return;
+	}else{
+        tot+=a[i];
+        total(a, i+1, n, tot);
+    }
+}
+
+void maselegido(int *a, int i, int n, int max, int pos){
+    if(i<n){
+        if(a[i]<max){
+            max=a[i];
+            pos=i;
+        }
+        maselegido(a,i+1,n,max,pos);
+    }else{
+		printf("El lenguaje mas elegido es: %s\n", lenguajes[pos-1]);
+		return;
+	} 
+}
+
+void menosde(int *a, int i, int n, int p){
+    if(i==n) return;
+    else{
+        if(a[i]<4000){
+        p=i;
+        printf("%s, se eligio por menos de 4000 encuestados.\n", lenguajes[p]);
+        menosde(a,i+1,n,p);
+        }
+    }
+}
+
+void menu(){
+    for(int i=0; i<6; i++){
+        printf("Numero: %d - Lenguaje: %s.\n", i+1, lenguajes[i]);
+    }
+    printf("\n");
+    printf("Ingrese el numero del lenguaje en el que se quiere inscribir, finalice con 0.\n");
+}
+
+void carga(int *a, int l){
+    menu();
+    scanf("%d", &l);
+    if(l==0){
+        printf("Arreglo cargado.\n");
+        return;
+    }else{
+        a[l-1]++;
+        carga(a,l);
+    }
+}
+
+void cereo(int *a, int i, int n){
+    if(i<n){
+        a[i]=0;
+        cereo(a, i+1, n));
+    }else return ;
+}
+
+int main(){
+    int a[6], l, p, pos, tot, cant1=0, cant2=0; 
+    cereo(a,0,6);         
+    carga(a,l);
+    menosde(a,0,6,p);
+    maselegido(a,0,6,999999,pos);
+    total(a,0,6,tot);
+    menosymas(a,0,6,cant1,cant2);
+    printf("Cantidad de lenguajes que fueron elegidos por menos de 5000 encuestados %d.\n", cant1);
+    printf("Cantidad de lenguajes que fueron elegidos por mas de 9000 encuestados %d.\n", cant2);
+}

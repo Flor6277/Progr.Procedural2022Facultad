@@ -1,0 +1,129 @@
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct{
+    int dni,peso;
+    char categoria;
+}boxe;
+
+int carga(boxe *&a){
+    int cant,i;
+    printf("Ingresar cantidad de participantes:");
+    scanf("%d",&cant);
+    fflush(stdin);
+    a=(boxe*)calloc(cant,sizeof(boxe));
+
+    for(i=0;i<cant;i++){
+        printf("Ingresar peso:");
+        scanf("%d",&a[i].peso);
+        fflush(stdin);
+        if(a[i].peso<47 || a[i].peso>90){
+            printf("ingreso mal el peso volver a ingresar: ");
+            scanf("%d",&a[i].peso);
+        }
+        printf("Ingresar categoria: ");
+        scanf("%c",&a[i].categoria);
+        if(a[i].categoria<'a' || a[i].categoria>'h'){
+            printf("Se ingreso mal la categoria volver a ingresarla:");
+            scanf("%c",&a[i].categoria);
+            fflush(stdin);
+        }
+
+        printf("Ingresar dni: ");
+        scanf("%d",&a[i].dni);
+        fflush(stdin);
+    }
+
+    return cant;
+
+}
+int busca_mayor(boxe *a,int cant, int i,int mayor,char cate){
+    if(i<cant){
+        if(a[i].peso>mayor && a[i].categoria==cate){
+            mayor=a[i].peso;
+            return busca_mayor(a,cant,i+1,mayor,cate);
+        }
+    }
+    return mayor;
+}
+
+int cuenta_iguales(boxe *a,int cant, int i, int mayor, int &cuenta,char cate){
+    if(i<cant){
+        if(a[i].peso==mayor && a[i].categoria==cate){
+            cant++;
+            cuenta_iguales(a,cant,i+1,mayor,cant,cate);
+        }
+    }
+    return cant;
+}
+
+void llena_sub_dni(boxe *a, int cant, int i, int mayor, int *dni_mayor,int cuenta,int j,char cate){
+    if(i<cant){
+        if(a[i].peso==mayor && a[i].categoria==cate){
+            dni_mayor[j]=a[i].dni;
+            llena_sub_dni(a,cant,i+1,mayor,dni_mayor,cuenta,j+1,cate);
+        }else{
+            llena_sub_dni(a,cant,i+1,mayor,dni_mayor,cuenta,j,cate);
+        }
+    }
+}
+
+void muestra_dni(int cant, int *dni){
+    int i;
+    printf("Dni de la categoria pedida que tienen el mismo peso que el mayor peso \n: ");
+    for(i=0;i<cant;i++){
+        printf("%d \n",dni[i]);
+    }
+}
+
+int cate_mayores(int *&dni_mayor,boxe *a,int cant){
+    int mayor=0,cuenta=0;
+    char cate;
+    printf("Ingresar la categoria que va a realizar la busqueda: ");
+    scanf("%c",&cate);
+    fflush(stdin);
+    mayor=busca_mayor(a,cant,0,mayor,cate);
+    cuenta=cuenta_iguales(a,cant,0,mayor,cuenta,cate);
+    dni_mayor=(int*)calloc(cuenta,sizeof(int));
+    llena_sub_dni(a,cant,0,mayor,dni_mayor,cuenta,0,cate);
+    muestra_dni(cuenta,dni_mayor);
+    free(dni_mayor);
+    dni_mayor=NULL;
+    return cuenta;
+}
+
+void muestra_cant_peso(int *cant_peso,int n,int i){
+    if(i<=n){
+        printf("Cantidad de participantes con el peso %d es: %d \n",47+i,cant_peso[i]);
+       muestra_cant_peso(cant_peso,n,i+1);
+    }
+
+}
+
+void llena_cant_peso(boxe *a, int cant, int *&cant_peso){
+    int i;
+    cant_peso=(int*)calloc(90-47,sizeof(int));
+    for(i=0;i<cant;i++){
+        cant_peso[a[i].peso-47]++;
+    }
+    muestra_cant_peso(cant_peso,90-47,0);
+    free(cant_peso);
+    cant_peso=NULL;
+}
+
+int main()
+{
+    boxe *a;
+    int *dni_mayor,*cant_peso;
+    int cant;
+
+    cant=carga(a);
+    cate_mayores(dni_mayor,a,cant);
+    llena_cant_peso(a,cant,cant_peso);
+
+    free(a);
+    a=NULL;
+    return 0;
+}

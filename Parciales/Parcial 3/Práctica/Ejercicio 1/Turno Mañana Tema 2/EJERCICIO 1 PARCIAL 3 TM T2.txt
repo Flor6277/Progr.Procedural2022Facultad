@@ -1,0 +1,104 @@
+/*Ejercicio 1 
+Se tiene un archivo "DATOS.DAT" con la informacion del caudal de agua de 5 rios. De cada rio se tiene registrado: caudal de agua, codigo de rio (1...5),numero de mes enq ue se hizo medicion(1...12),
+Se pide que usando funciones para cada item, resuelva lo siguiente:
+1)Ingresar un codigo de mes y mostrar los codigos de rio que se midieron en esa fecha.
+2) Generar un arreglo dinamico con el codigo de rio y caudal para aquellos rios medidos entre los meses 6 y 12.
+3) Usando el arreglo generado, indicar cuantos rios tuvieron un caudal menor a 3 m cubicos, hacer una funcion recursiva que devuelva este resultado.
+4) Eliminar el arreglo generado. */
+
+#include <stdio.h>
+
+
+typedef struct
+{
+	float caudal;
+	int cod,mes;	
+}rio;
+
+typedef struct
+{
+	int codi;
+	float cau;
+}aux;
+
+void mostrar(FILE *archi)
+{
+	rio r;
+	int codigo;
+	printf("Ingrese un codigo de mes:");
+	scanf("%d",&cod);
+	rewind(archi);
+	while(fread(&r,sizeof(r),1,archi))
+	{
+		if(codigo==r.mes)
+		{
+			printf("Codigo de rio medido este mes: %d",r.cod);
+		}
+	}
+}
+
+int contar(FILE *archi)
+{
+	rio r;
+	int cont = 0;
+	rewind(archi);
+	while(fread(&r,sizeof(r),1,archi))
+	{
+		if((r.mes)>=6 && (r.mes<=12))
+		{
+			cont = cont + 1;
+		}
+	}
+	
+	return(cont);
+}
+
+void (FILE *archi,aux *a)
+{
+	rio r;
+	rewind(archi);
+		while(fread(&r,sizeof(r),1,archi))
+	{
+		if((r.mes)>=6 && (r.mes<=12))
+		{
+			a.codi=r.cod;
+			a.cau=r.caudal;
+		}
+	}
+}
+
+int indicar(aux *a,int c,int i, int cont2)
+{
+	if(i<c)
+	{
+		if(a.cau<3)
+		{
+			cont2=cont2 + 1;
+		}
+		indicar(a,c,i+1,cont2);
+	}
+	return(cont2);
+}
+
+int main()							/*	3) Usando el arreglo generado, indicar cuantos rios tuvieron un caudal menor a 3 m cubicos, hacer una funcion recursiva que devuelva este resultado 4) Eliminar el arreglo generado. */
+{	
+	FILE *archi;
+	int cont,cont2=0;
+	aux *a;
+	
+	if((archi=fopen("DATOS.DAT","r"))==NULL)
+	{
+		printf("Error al abrir el archivo\n");
+	}
+	else
+	{
+		mostrar(archi);
+		cont=contar(archi);
+		a = (aux*) malloc(sizeof(aux)*cont);
+		cargaaux(archi,a);
+		fclose(archi);
+		cont2 =	indicar(a,cont,0,cont2);
+		printf("La cantidad de rios que tuvieron un caudal menor a 3 mcubicos es de: %d",cont2);
+		free(a);	
+	}
+}

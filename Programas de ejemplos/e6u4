@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+void cereo(int arr[], int i){
+   if(i < 5){
+        arr[i] = 0;
+        cereo(arr,i+1);
+   }
+    
+}
+
+void carga(int arr[],int i){
+    if(i < 5){
+        arr[i] = rand()% 10 - 1;
+        carga(arr,i+1);
+    }
+}
+void busqueda(int arr[],int i,int max){
+    if((arr[i] > max) && (i < 5)){
+        max = arr[i];
+        busqueda(arr,i+1,max);
+    }else{
+        printf("\n El maximo del arreglo es %d",max);
+    }
+}
+
+void mostrar(int arr[],int i){
+    if(i < 5){
+        printf("|%d|",arr[i]);
+        mostrar(arr,i+1);
+    }
+}
+
+
+int main(){
+    srand(time(NULL));
+    int arr[5];
+
+    cereo(arr,0);
+    carga(arr,0);
+    mostrar(arr,0);
+    busqueda(arr,0,0);
+}

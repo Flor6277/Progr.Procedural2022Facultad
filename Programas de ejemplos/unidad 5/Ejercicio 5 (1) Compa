@@ -1,0 +1,88 @@
+//Ejercicio 5
+//Realizar un programa que mediante funciones recursivas permita:
+//a) Generar una lista enlazada de números enteros positivos, ordenada en forma ascendente. Validar la entrada.
+//b) Escribir un mensaje indicando si el número del último nodo de la lista es par. 
+
+
+#include<iostream>
+#include<malloc.h>
+
+using namespace std;
+
+struct nodo
+{ int nro;
+struct nodo *sig;
+};
+typedef struct nodo*puntero;
+
+void insertar (puntero & xp)
+{ int dato;
+puntero nuevo, p, anterior;
+cout<<"Ingrese un numero natural (0 para terminar) \n";
+cin>>dato;
+while (dato<0){
+	cout<<"Numero incorrecto, ingrese un numero natural\n";
+cin>>dato;
+}
+while (dato != 0)
+{
+nuevo =(puntero)malloc(sizeof(struct nodo));
+nuevo->nro=dato;
+if(xp==NULL){
+	xp=nuevo;
+	nuevo->sig=NULL;
+}
+else{
+	if(xp->nro>dato){
+		nuevo->sig=xp;
+		xp=nuevo;
+	}
+	else{
+		p=xp->sig;
+		anterior=xp;
+		while((p!=NULL) && (dato>p->nro)){
+			anterior=p;
+			p=p->sig;
+		}
+		anterior->sig=nuevo;
+		nuevo->sig=p;
+	}
+}
+cout<<"Ingrese un numero natural (0 para terminar) \n";
+cin>>dato;
+while (dato<0){
+	cout<<"Numero incorrecto, ingrese un numero natural\n";
+cin>>dato;
+}
+}
+}
+
+void recorre (puntero xp)
+{
+	static int i=0;
+	puntero p;	
+cout<<"\n*-----Listado de datos-----*";
+while (xp != NULL)
+{
+i+=1;
+cout<<"\n Numero "<<i<<": "<<xp->nro;
+p=xp;
+xp=xp->sig;
+}
+if(p->nro%2==0){
+	cout<<"\n El ultimo nodo es par.";
+}
+else{
+	cout<<"\n El ultimo nodo es impar.";
+} 
+}
+
+void crear (puntero &xp){
+xp=NULL;
+}
+int main (){
+puntero cabeza;
+crear(cabeza);
+insertar(cabeza);
+recorre(cabeza);
+}

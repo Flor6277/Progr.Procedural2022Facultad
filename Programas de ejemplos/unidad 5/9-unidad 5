@@ -1,0 +1,214 @@
+/*
+Ejercicio 9
+La biblioteca de la facultad cuenta con una cantidad variable de libros de Programación Procedural en calidad de
+préstamo en la sala de lectura que puede modificarse. Una vez prestados los libros, de los cuales se registra el
+código, se confecciona para cada uno una lista de alumnos que están en cola de espera. Por cada alumno se guarda:
+nombre y carrera (LSI, LCC)
+Se pide realizar un programa, que a través de un menú de opciones y mediante el uso de funciones, de respuesta a
+las siguientes situaciones:
+        a) Crear una lista de listas inicializadas en NULL. para almacenar la información de los libros
+        b) Para un código de libro solicitado, insertar un alumno a la cola de espera correspondiente. Usar una función
+        recursiva.
+        c) Ingresar un nuevo libro para que esté en calidad de préstamo en la biblioteca.
+        d) Suponiendo devuelto un libro cuyo código se lee, realizar un préstamo al primer alumno de la lista
+        correspondiente y actualizar la misma (Esto es eliminarlo de la lista)
+        e) Ingresar un código de libro y una carrera, mostrar los nombres de los alumnos de dicha carrera que están en cola
+        de espera.
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <string.h>
+
+struct alu{
+    char nom[20];
+    char car[20];
+    struct alu *sig;
+};
+
+typedef struct alu *puntero;
+
+struct libros{
+    int cod;
+    struct libros *sigLibros;
+    puntero cab;
+};
+
+typedef struct libros *punteroLibro;
+
+void crearListaLibros(punteroLibro &xp){
+    xp=NULL;
+}
+void cargaLibros(punteroLibro &xp){
+    int cod;
+    punteroLibro nuevo;
+    printf("\n");
+    printf("-Ingrese codigo de libro, use 0 para finalizar \n");
+    scanf("%d", &cod);
+    fflush(stdin);
+    while(cod!=0){
+    nuevo=(punteroLibro)malloc(sizeof(libros));
+    nuevo->sigLibros=xp;
+    xp=nuevo;
+    xp->cab=NULL;
+    xp->cod=cod;
+    printf("...Libro cargado \n");
+    printf("-Ingrese codigo de libro, use 0 para finalizar \n");
+    scanf("%d", &cod);
+    fflush(stdin);
+    }
+}
+punteroLibro buscaLibro(punteroLibro xp, int cod){
+    while(xp!=NULL && xp->cod!=cod){
+        xp=xp->sigLibros;
+    }
+    return xp;
+}
+void insertaAlu(punteroLibro &aux){
+    puntero nuevo;
+    nuevo=(puntero)malloc(sizeof(alu));
+    nuevo->sig=aux->cab;
+    aux->cab=nuevo;
+    gets(nuevo->nom);
+    fflush(stdin);
+    gets(nuevo->car);
+    fflush(stdin);
+}
+void cargaAlumnos(punteroLibro &xp){
+    int cod;
+    punteroLibro aux;
+    printf("Ingrese codigo de libro a poner el alumno en lista de espera: 0 Finalizar\n");
+    scanf("%d", &cod);
+    fflush(stdin);
+    if(cod!=0){
+        aux=buscaLibro(xp, cod);
+        if(aux!=NULL){
+            printf("Se encontro el libro \n");
+            printf("Ingrese nombre y carrera para colocar en la lista \n");
+            insertaAlu(aux);
+            printf("Alumno insertado a la lista de espera con exito \n");
+        }else{
+            printf("No se encontro el codigo \n");
+        }
+        return cargaAlumnos(xp);
+    }else{
+        return;
+    }
+}
+void cargaLibroNuevo(punteroLibro &xp){
+    int cod;
+    punteroLibro nuevo;
+    printf("\n");
+    printf("-Ingrese codigo de libro nuevo a ingresar 0 para no ingresar \n");
+    scanf("%d", &cod);
+    fflush(stdin);
+if(cod!=0){
+    nuevo=(punteroLibro)malloc(sizeof(libros));
+    nuevo->sigLibros=xp;
+    xp=nuevo;
+    xp->cab=NULL;
+    xp->cod=cod;
+    printf("...Libro cargado \n");
+}
+}
+void eliminarEspera(punteroLibro aux){
+    puntero ant, nuevoAux;
+    if(aux->cab==NULL){
+        return;
+    }else if(aux->cab->sig==NULL){
+        aux->cab=NULL;
+    }else{
+        nuevoAux=aux->cab->sig;
+        while(nuevoAux->sig!=NULL){
+                ant=nuevoAux;
+                nuevoAux=nuevoAux->sig;
+    }
+    ant->sig=NULL;
+    }
+}
+void eliminarAlumLista(punteroLibro xp){
+    int cod;
+    char nomCar[20];
+    punteroLibro aux;
+    printf("Ingrese el codigo de libro devuelto \n");
+    scanf("%d", &cod);
+    fflush(stdin);
+    aux=buscaLibro(xp, cod);
+    if(aux!=NULL){
+    printf("Se encontro el libro, eliminando al alumno correspondiente \n");
+    eliminarEspera(aux);
+    printf("eliminado.. \n");
+    }else{
+    printf("No se encontro el libro solicitado \n");
+    }
+}
+void listar(punteroLibro aux, char nomCar[20]){
+    puntero a=aux->cab;
+    while(a!=NULL){
+        if(strcmp(a->car,nomCar)==0){
+                printf("%s", a->nom);
+                printf("\n");
+           }
+        a=a->sig;
+    }
+}
+void mostrarLista(punteroLibro xp){
+    int cod;
+    char nomCar[20];
+    punteroLibro aux;
+    printf("Ingrese el codigo del libro para ver la lista \n");
+    scanf("%d", &cod);
+    fflush(stdin);
+    aux=buscaLibro(xp,cod);
+    printf("Ingrese carrera a buscar: \n");
+    gets(nomCar);
+    fflush(stdin);
+    listar(aux, nomCar);
+}
+void mostrarTodo(punteroLibro xp){
+    punteroLibro aux;
+    aux=xp;
+    puntero a;
+    a=aux->cab;
+    while(aux!=NULL){
+        printf("codigo de libro:  %d. Listado: \n", aux->cod);
+        while(a!=NULL){
+            printf("Nombre Alumno: %s, carrera: %s", a->nom, a->car);
+            printf("\n");
+            a=a->sig;
+        }
+        aux=aux->sigLibros;
+    }
+}
+int main(){
+    /*
+    a) Crear una lista de listas inicializadas en NULL. para almacenar la información de los libros
+    */
+    punteroLibro cabLibro;
+    system("color B");
+    crearListaLibros(cabLibro);
+    cargaLibros(cabLibro);
+
+    /*
+    b) Para un código de libro solicitado, insertar un alumno a la cola de espera correspondiente. Usar una función
+        recursiva.
+    */
+    cargaAlumnos(cabLibro);
+    /*
+    c) Ingresar un nuevo libro para que esté en calidad de préstamo en la biblioteca.
+    */
+    cargaLibroNuevo(cabLibro);
+    /*
+    d) Suponiendo devuelto un libro cuyo código se lee, realizar un préstamo al primer alumno de la lista
+        correspondiente y actualizar la misma (Esto es eliminarlo de la lista)
+    */
+    eliminarAlumLista(cabLibro);
+    //mostrarTodo(cabLibro);
+    /*
+    e) Ingresar un código de libro y una carrera, mostrar los nombres de los alumnos de dicha carrera que están en cola
+        de espera.
+    */
+    mostrarTodo(cabLibro);
+    mostrarLista(cabLibro);
+    mostrarTodo(cabLibro);
+}
